@@ -31,6 +31,7 @@ rm mappings.reform.tsv
 You can then extract the signal data from the pod5 files with:
 ```bash
 python pod5kmersig.py mappings.reform-compressed.tsv reads.pod5
+rm mappings.reform-compressed.tsv
 ```
 
 If your pod5s are in multiple files, you can run:
