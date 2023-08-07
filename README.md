@@ -3,7 +3,7 @@ Tools for getting signals aligned to read sequence for R10 flow cells and Dorado
 
 
 
-You need to start with .pod5 current signal files and a basecalled .bam file that contains both the MD tag and the move table (Dorado --emit_moves).
+You need to start with .pod5 current signal files and a basecalled and sorted and indexed .bam file that contains both the MD tag and the move table (Dorado --emit_moves).
 
 This tool depends on and was inspired by squigalizer: https://github.com/hiruna72/squigualiser
 
