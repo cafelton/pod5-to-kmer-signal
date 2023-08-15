@@ -31,8 +31,8 @@ for s in samfile:
                 thischr, thisstart = alignchr, alignstart   
             thisend = alignend
             thischunk.add(s.query_name)
+            c += 1
 readchunks[(thischr, thisstart, thisend)] = thischunk
-        #c += 1
         #thischunk.add(s.query_name)
         #if c%10000 == 0:
         #    readchunks.append(thischunk)
@@ -56,41 +56,42 @@ for chunkpos in readchunks:
             alignstart = s.reference_start
             readname = s.query_name
             strand = -1 if s.is_reverse else 1
-            chr = s.reference_name
-            seq = s.query_sequence if not s.is_reverse else s.get_forward_sequence()
-            # if s.is_reverse: seq = getrevcomp(seq)
-            len_seq = len(seq) - kmer_length + 1  # to get the number of kmers
-
-            ns = int(s.get_tag("ns")) ##number of signals
-            ts = int(s.get_tag("ts")) ##signal start delay
-            mv = s.get_tag("mv") ##signal list
-            len_mv = len(mv)
-
-            stride = mv[0]
-
-            mvpos = 1
-            move_count = 0
-
-            start_signal_idx = ts
-            currsiglen = 0
-        # kmer_idx = 0
-
-            kmersigpos = []
-
-        ###Can we not save kmer_idx? Seems like each kmer will be represented in signal, so kmersigpos[i] = signal for kmer at pos i
-            while mvpos < len_mv:
-                mv_val = mv[mvpos]
-                currsiglen += stride
-                if mv_val == 1 or mv_val == len_mv-1:
-                    kmersigpos.append((start_signal_idx, start_signal_idx+currsiglen)) #(kmer_idx, start_signal_idx, start_signal_idx+currsiglen))
-                    start_signal_idx += currsiglen
-                    currsiglen = 0
-                # kmer_idx += 1
-                mvpos += 1
-            readtoseq[readname] = [chr, strand, alignstart, seq, kmersigpos]
-
-            #c += 1
-            #if c % 1000 == 0: print('processed ' + str(c) + ' reads from .bam file')
+            if readname in readchunks[chunkpos]: 
+                chr = s.reference_name
+                seq = s.query_sequence if not s.is_reverse else s.get_forward_sequence()
+                # if s.is_reverse: seq = getrevcomp(seq)
+                len_seq = len(seq) - kmer_length + 1  # to get the number of kmers
+    
+                ns = int(s.get_tag("ns")) ##number of signals
+                ts = int(s.get_tag("ts")) ##signal start delay
+                mv = s.get_tag("mv") ##signal list
+                len_mv = len(mv)
+    
+                stride = mv[0]
+    
+                mvpos = 1
+                move_count = 0
+    
+                start_signal_idx = ts
+                currsiglen = 0
+            # kmer_idx = 0
+    
+                kmersigpos = []
+    
+            ###Can we not save kmer_idx? Seems like each kmer will be represented in signal, so kmersigpos[i] = signal for kmer at pos i
+                while mvpos < len_mv:
+                    mv_val = mv[mvpos]
+                    currsiglen += stride
+                    if mv_val == 1 or mv_val == len_mv-1:
+                        kmersigpos.append((start_signal_idx, start_signal_idx+currsiglen)) #(kmer_idx, start_signal_idx, start_signal_idx+currsiglen))
+                        start_signal_idx += currsiglen
+                        currsiglen = 0
+                    # kmer_idx += 1
+                    mvpos += 1
+                readtoseq[readname] = [chr, strand, alignstart, seq, kmersigpos]
+    
+                #c += 1
+                #if c % 1000 == 0: print('processed ' + str(c) + ' reads from .bam file')
     #samfile.close()
     print('done processing bam file for chunk ', chunkpos)
 
@@ -122,7 +123,7 @@ for chunkpos in readchunks:
                     # out.write('\t')
                     # signallines.append((c, pos[0], tuple(signal[pos[1]:pos[2]])))
             readcodes.append((readname, c))
-                #c += 1
+            c += 1
                 #if c % 1000 == 0: print('processed ' + str(c) + ' reads from .pod5 file')
                 
     for r in readcodes:
