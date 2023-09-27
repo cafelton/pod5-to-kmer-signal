@@ -3,9 +3,58 @@ Tools for getting signals aligned to read sequence for R10 flow cells and Dorado
 
 
 
-You need to start with .pod5 current signal files and a basecalled and sorted and indexed .bam file that contains both the MD tag and the move table (Dorado --emit_moves).
+You need to start with a merged .pod5 current signal file and a basecalled and sorted and indexed .bam file that contains both the MD tag and the move table (Dorado --emit_moves).
 
-This tool depends on and was inspired by squigalizer: https://github.com/hiruna72/squigualiser
+This tool was inspired by squigalizer: https://github.com/hiruna72/squigualiser
+
+# NEW VERSION (faster, more compressed)
+```bash
+usage: python[3+] bampod5kmersig-arrow.py -b sample.bam -p sample.pod5 -n 2000 -c chrI
+Predicting the best modification threshold and dist from positive and negative control bam files. Will output a tsv file containing those values.
+options:
+  -h, --help            show this help message and exit
+  -b B, --bam B         R10 basecalled bam file, should have moves table and be indexed. Can be filtered to locus or not. Only reads in this bam will have signal called for kmers
+  -p P, --pod5 P        R10 pod5 file, should have all reads that are included in bam. This should be a single file, not multiple
+  -o O, --outputprefix O
+                        Output filename prefix
+  -s, --scale           whether to scale the signal values to facillitate comparison between reads, requires that pod5 reads have a non-nan value in the predicted_scaling area
+  -c C, --chr C         chromosome to get reads from
+  -n N, --numreads N    number of reads to get. if -c is specified, will be first n reads on the chromosome specified, otherwise will be first n reads on first chr
+```
+
+In the output there will be one row for each base in each read.
+
+The schema for the parquet table is as follows:
+```bash
+readcode: string
+kmeridx: int64
+qkmer: string (9 chars long)
+refpos: int64
+refkmer: string (1 char)
+signalLen: int64
+signal: list<item: double>
+  child 0, item: double
+```
+
+
+
+To look at a specific region in the output:
+
+look at current signal for one file at a specific locus:
+```bash
+python3 plotSignalInRegion-arrow.py chrI:4300-4320 sample1.bam sample1-kmersignal-complete.parquet
+```
+
+look at overlapping current signal for multiple files at a specific locus:
+```bash
+python3 plotSignalInRegion-arrow.py chrI:4300-4320 sample1.bam sample1-kmersignal-complete.parquet sample2.bam sample2-kmersignal-complete.parquet
+```
+
+
+
+
+
+# OLD INSTRUCTIONS FOR OLD VERSION
 
 I reccommend installing squigalizer with the conda environment:
 ```bash
