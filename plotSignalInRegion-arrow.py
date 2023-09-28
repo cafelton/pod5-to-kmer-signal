@@ -233,5 +233,5 @@ for readtosiginregion in allreadtosig:
 #     for p in range(qend-qstart):
 #         plt.text(qstart + p + .5, 130, str(round(abs(sigdiff[p][1]-sigdiff[p][0]))), ha='center')
 
-plt.savefig(bamfile.split('.')[0] + region + '-readsigplots-overlaid-with-variability-posstrand-arrow.png', dpi=600)
+plt.savefig(bamfile.split('/')[-1].split('.')[0] + region + '-readsigplots-overlaid-with-variability-posstrand-arrow.png', dpi=600)
 print('done')
